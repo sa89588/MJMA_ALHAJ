@@ -3,7 +3,7 @@
    ══════════════════════════════════════ */
 const DCFG = {
   // 🔧 نفس رابط Web App المستخدم في admin/customer
-  API_URL: 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec',
+  API_URL: 'https://script.google.com/macros/s/AKfycbyYkVK28zF3lny6YpiB_opQ60Ao8jtOBnR0cpCc5ov3j90_aZWF8RdUknsb-TlIM8XkDA/exec',
 
   NOTIF_ICONS: {
     shortage   : 'fa-triangle-exclamation',
