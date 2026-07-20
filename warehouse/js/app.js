@@ -2,7 +2,7 @@
    js/config.js
    ══════════════════════════════════════════ */
 const WCFG = {
-  API_URL      : 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec',
+  API_URL      : 'https://script.google.com/macros/s/AKfycbyYkVK28zF3lny6YpiB_opQ60Ao8jtOBnR0cpCc5ov3j90_aZWF8RdUknsb-TlIM8XkDA/exec',
   POLL_MS      : 10000,   // كل 10 ثواني
   URGENT_MIN   : 30,      // تنبيه عند تأخر أكثر من 30 دقيقة
   SHORTAGE_REASONS: [
