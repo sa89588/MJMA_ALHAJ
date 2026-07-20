@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>كتالوج الإطارات والبطاريات</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     صفحة تسجيل الدخول
+     ══════════════════════════════════════════ -->
+<div id="loginPage">
+  <div class="login-bg"></div>
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-ring">
+        <i class="fa-solid fa-circle-dot"></i>
+      </div>
+      <h1 id="loginStoreName">متجر الإطارات والبطاريات</h1>
+      <p>بوابة الزبائن</p>
+    </div>
+    <form onsubmit="CAuth.login(event)">
+      <div class="l-field">
+        <i class="fa-solid fa-user"></i>
+        <input id="lu" type="text" placeholder="اسم المستخدم" autocomplete="username" required>
+      </div>
+      <div class="l-field">
+        <i class="fa-solid fa-lock"></i>
+        <input id="lp" type="password" placeholder="كلمة المرور" autocomplete="current-password" required>
+        <button type="button" class="eye-btn" onclick="CAuth.toggleEye()">
+          <i class="fa-solid fa-eye" id="eyeIcon"></i>
+        </button>
+      </div>
+      <div id="loginErr" class="l-error hidden"></div>
+      <button type="submit" class="l-btn" id="lBtn">
+        <span id="lBtnTxt"><i class="fa-solid fa-right-to-bracket"></i> دخول</span>
+        <span id="lBtnSpin" class="hidden"><i class="fa-solid fa-spinner fa-spin"></i></span>
+      </button>
+    </form>
+    <p class="l-note">هذه البوابة مخصصة للزبائن المعتمدين فقط</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     التطبيق الرئيسي
+     ══════════════════════════════════════════ -->
+<div id="appRoot" class="hidden">
+
+  <!-- ─ شريط علوي ─ -->
+  <header id="appHeader">
+    <div class="header-brand">
+      <span id="headerEmoji">🚗</span>
+      <span id="headerName">المتجر</span>
+    </div>
+    <div class="header-right">
+      <div class="header-user">
+        <div class="user-dot" id="headerUserDot">ز</div>
+        <span id="headerUserName">—</span>
+      </div>
+      <button class="cart-btn" id="cartBtn" onclick="CCart.openPanel()">
+        <i class="fa-solid fa-basket-shopping"></i>
+        <span class="cart-cnt hidden" id="cartBadge">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ─ شريط البحث والفلاتر ─ -->
+  <div id="searchBar">
+    <div class="search-wrap">
+      <i class="fa-solid fa-magnifying-glass s-icon"></i>
+      <input id="searchInput" type="search" placeholder="ابحث: 205 16 ميشلان  أو  60 فارتا ..."
+             oninput="CCatalog.search()" autocomplete="off">
+      <button class="s-clear hidden" id="clearSearch" onclick="CCatalog.clearSearch()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="filter-chips" id="filterChips">
+      <button class="chip active" data-type="" onclick="CCatalog.setType(this,'')">الكل</button>
+      <button class="chip" data-type="PCR"      onclick="CCatalog.setType(this,'PCR')">PCR</button>
+      <button class="chip" data-type="TBR"      onclick="CCatalog.setType(this,'TBR')">TBR</button>
+      <button class="chip" data-type="بطاريات"  onclick="CCatalog.setType(this,'بطاريات')">بطاريات</button>
+    </div>
+  </div>
+
+  <!-- ─ المحتوى ─ -->
+  <main id="mainArea">
+
+    <!-- كتالوج المنتجات -->
+    <div id="view-catalog" class="cview active">
+      <div id="catalogList"></div>
+    </div>
+
+    <!-- سلة الطلب (لوحة) -->
+    <div id="view-cart" class="cview">
+      <div class="cart-header-bar">
+        <button class="back-btn" onclick="CApp.goTo('catalog')">
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <h2>قائمة طلبي</h2>
+        <button class="clear-cart-btn" onclick="CCart.clear()">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+
+      <div class="cart-meta">
+        <div class="cmeta-field">
+          <label>ملاحظات الطلب (اختياري)</label>
+          <input id="cartNotes" type="text" placeholder="أي ملاحظات للمتجر...">
+        </div>
+      </div>
+
+      <div id="cartItems"></div>
+
+      <div id="cartEmpty" class="empty-cart hidden">
+        <i class="fa-solid fa-basket-shopping"></i>
+        <p>القائمة فارغة — اختر منتجات من الكتالوج</p>
+        <button class="btn-go-catalog" onclick="CApp.goTo('catalog')">
+          <i class="fa-solid fa-arrow-right"></i> إلى الكتالوج
+        </button>
+      </div>
+
+      <div class="cart-totals" id="cartTotals">
+        <div class="ct-row"><span>عدد الأصناف</span><strong id="ctCount">0</strong></div>
+        <div class="ct-row"><span>المجموع الفرعي</span><strong id="ctSubtotal">0</strong></div>
+        <div class="ct-row disc" id="ctDiscRow">
+          <span>إجمالي الخصم</span>
+          <strong id="ctDisc" class="disc-val">0</strong>
+        </div>
+        <div class="ct-divider"></div>
+        <div class="ct-row grand">
+          <span>الإجمالي</span>
+          <strong id="ctGrand">0</strong>
+        </div>
+        <div class="ct-currency" id="cartCurrency">دينار عراقي</div>
+      </div>
+
+      <div class="cart-actions">
+        <button class="btn-whatsapp" onclick="CCart.sendWhatsapp()">
+          <i class="fa-brands fa-whatsapp"></i> إرسال عبر واتساب
+        </button>
+        <button class="btn-submit" id="submitBtn" onclick="CCart.submit()">
+          <i class="fa-solid fa-paper-plane"></i> إرسال الطلب
+        </button>
+      </div>
+    </div>
+
+    <!-- سجل طلباتي -->
+    <div id="view-orders" class="cview">
+      <div class="section-title">
+        <i class="fa-solid fa-box"></i> طلباتي
+      </div>
+      <div id="myOrdersList"></div>
+    </div>
+
+    <!-- تفاصيل طلب + تتبع -->
+    <div id="view-orderDetail" class="cview">
+      <div class="cart-header-bar">
+        <button class="back-btn" onclick="CApp.goTo('orders')">
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <h2 id="orderDetailTitle">تفاصيل الطلب</h2>
+        <span></span>
+      </div>
+      <div id="orderDetailContent"></div>
+    </div>
+
+  </main>
+
+  <!-- ─ شريط الطلب العائم ─ -->
+  <div id="floatCart" class="hidden" onclick="CApp.goTo('cart')">
+    <div class="fc-info">
+      <span class="fc-count"><span id="fcCount">0</span> صنف</span>
+      <span class="fc-total" id="fcTotal">0</span>
+    </div>
+    <button class="fc-btn">
+      <i class="fa-solid fa-basket-shopping"></i> عرض القائمة
+    </button>
+  </div>
+
+  <!-- ─ شريط التنقل السفلي ─ -->
+  <nav id="bottomNav">
+    <button class="bnav active" data-view="catalog" onclick="CApp.goTo('catalog')">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <span>الكتالوج</span>
+    </button>
+    <button class="bnav" data-view="cart" onclick="CApp.goTo('cart')">
+      <i class="fa-solid fa-basket-shopping"></i>
+      <span>قائمتي</span>
+      <span class="bnav-badge hidden" id="bnavBadge">0</span>
+    </button>
+    <button class="bnav" data-view="orders" onclick="CApp.goTo('orders')">
+      <i class="fa-solid fa-box"></i>
+      <span>طلباتي</span>
+    </button>
+    <button class="bnav" onclick="CAuth.logout()">
+      <i class="fa-solid fa-right-from-bracket"></i>
+      <span>خروج</span>
+    </button>
+  </nav>
+
+</div><!-- /appRoot -->
+
+<!-- ─ إشعارات ─ -->
+<div id="toasts"></div>
+
+<!-- ─ شاشة تحميل ─ -->
+<div id="pageLoader" class="hidden">
+  <i class="fa-solid fa-spinner fa-spin"></i>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/catalog.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/app.js"></script>
+<script src="js/meta-pixel.js"></script>
+</body>
+</html>

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة الإدارة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ══ تسجيل الدخول ══ -->
+<div id="loginPage">
+  <div class="login-bg"><div class="tread-pattern"></div></div>
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-wheel"><i class="fa-solid fa-circle-dot"></i></div>
+      <h1 id="loginStoreName">متجر الإطارات والبطاريات</h1>
+      <p class="login-subtitle">لوحة الإدارة</p>
+    </div>
+    <form onsubmit="Auth.login(event)">
+      <div class="form-group">
+        <label><i class="fa-solid fa-user"></i> اسم المستخدم</label>
+        <input id="loginUsername" type="text" placeholder="اسم المستخدم" autocomplete="username" required>
+      </div>
+      <div class="form-group">
+        <label><i class="fa-solid fa-lock"></i> كلمة المرور</label>
+        <div class="pass-wrap">
+          <input id="loginPassword" type="password" placeholder="كلمة المرور" autocomplete="current-password" required>
+          <button type="button" class="pass-toggle" onclick="Auth.togglePass()">
+            <i class="fa-solid fa-eye" id="passEye"></i>
+          </button>
+        </div>
+      </div>
+      <div id="loginError" class="login-error hidden"></div>
+      <button type="submit" class="btn-login" id="loginBtn">
+        <span id="loginBtnText"><i class="fa-solid fa-right-to-bracket"></i> دخول</span>
+        <span id="loginBtnSpin" class="hidden"><i class="fa-solid fa-spinner fa-spin"></i> جارٍ التحقق...</span>
+      </button>
+    </form>
+    <div class="login-footer"><small>نظام إدارة الموظفين والمحاسبين</small></div>
+  </div>
+</div>
+
+<!-- ══ التطبيق ══ -->
+<div id="appShell" class="hidden">
+
+  <!-- شريط جانبي -->
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <div class="store-logo">
+        <span id="sidebarEmoji">🚗</span>
+        <div>
+          <div class="store-title" id="sidebarStoreName">متجر الإطارات</div>
+          <div class="store-sub">لوحة الإدارة</div>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">الرئيسية</div>
+      <a class="nav-item active" data-view="dashboard">
+        <i class="fa-solid fa-gauge-high"></i> لوحة التحكم
+      </a>
+      <a class="nav-item" data-view="kanban">
+        <i class="fa-solid fa-columns"></i> Kanban — حالة الطلبات
+        <span class="nav-badge zero" id="realtimePendingBadge" style="background:#ef4444;color:#fff">0</span>
+      </a>
+
+      <div class="nav-section-label">الكتالوج</div>
+      <a class="nav-item" data-view="tires">
+        <i class="fa-solid fa-circle-dot"></i> الإطارات
+      </a>
+      <a class="nav-item" data-view="batteries">
+        <i class="fa-solid fa-battery-full"></i> البطاريات
+      </a>
+
+      <div class="nav-section-label">الطلبات</div>
+      <a class="nav-item builder-nav" data-view="builder">
+        <i class="fa-solid fa-file-invoice"></i> قائمة طلب
+        <span class="order-count-badge zero" id="orderCountBadge">0</span>
+      </a>
+      <a class="nav-item perm-orders hidden" data-view="orders">
+        <i class="fa-solid fa-clock-rotate-left"></i> سجل الطلبات
+      </a>
+
+      <div class="nav-section-label perm-deliveries hidden">التوصيل</div>
+      <a class="nav-item perm-deliveries hidden" data-view="deliveries">
+        <i class="fa-solid fa-truck-fast"></i> سجل التسليمات
+      </a>
+      <a class="nav-item perm-deliveries hidden" data-view="driverReports">
+        <i class="fa-solid fa-chart-line"></i> تقارير السائقين
+      </a>
+
+      <div class="nav-section-label admin-only hidden">إدارة</div>
+      <a class="nav-item admin-only hidden perm-users" data-view="users">
+        <i class="fa-solid fa-users"></i> الزبائن
+      </a>
+      <a class="nav-item admin-only hidden" data-view="adminUsers">
+        <i class="fa-solid fa-user-tie"></i> الموظفون
+      </a>
+      <a class="nav-item admin-only hidden" data-view="drivers">
+        <i class="fa-solid fa-id-card-clip"></i> السائقون
+      </a>
+      <a class="nav-item admin-only hidden" data-view="adminProducts">
+        <i class="fa-solid fa-boxes-stacked"></i> إدارة المنتجات
+      </a>
+      <a class="nav-item admin-only hidden" data-view="adminSettings">
+        <i class="fa-solid fa-gear"></i> الإعدادات
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="userAvatar">م</div>
+        <div>
+          <div class="user-name"  id="userName">—</div>
+          <div class="user-level" id="userLevelBadge">—</div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="Auth.logout()" title="تسجيل خروج">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- المحتوى الرئيسي -->
+  <div id="mainWrap">
+    <header id="topHeader">
+      <button id="menuToggle" onclick="App.toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+      <div class="header-title" id="headerTitle">لوحة التحكم</div>
+      <div class="header-actions">
+        <!-- مؤشر الاتصال اللحظي -->
+        <span class="rt-indicator" id="realtimeIndicator">⟳ جارٍ...</span>
+        <!-- زر الصوت -->
+        <button id="soundToggleBtn" onclick="Sound.toggle()" title="تشغيل/كتم الصوت">
+          <i class="fa-solid fa-volume-high"></i>
+        </button>
+        <!-- زر خريطة GPS -->
+        <button class="btn-gps admin-only hidden" onclick="GPSMap.open()" title="خريطة السائقين">
+          <i class="fa-solid fa-map-location-dot"></i>
+        </button>
+        <!-- زر قائمة جديدة -->
+        <button class="btn-new-order" onclick="App.goTo('builder')">
+          <i class="fa-solid fa-plus"></i> قائمة جديدة
+        </button>
+        <!-- جرس الإشعارات -->
+        <div class="notif-bell-wrap">
+          <button class="notif-bell-btn" onclick="AdminNotifs.toggle()" title="الإشعارات">
+            <i class="fa-solid fa-bell"></i>
+            <span class="notif-bell-dot hidden" id="adminNotifDot"></span>
+          </button>
+          <div id="adminNotifPanel" class="notif-panel hidden"></div>
+        </div>
+        <div class="header-user"><span id="headerUserName">—</span></div>
+      </div>
+    </header>
+
+    <main id="mainContent">
+
+      <!-- ══ لوحة التحكم ══ -->
+      <div id="view-dashboard" class="view active">
+        <div class="page-header">
+          <h2><i class="fa-solid fa-gauge-high"></i> لوحة التحكم</h2>
+          <button class="btn btn-primary" onclick="App.goTo('kanban')">
+            <i class="fa-solid fa-columns"></i> عرض Kanban
+          </button>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card blue">
+            <div class="stat-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+            <div class="stat-body"><div class="stat-value" id="statOrders">—</div><div class="stat-label">إجمالي الطلبات</div></div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-icon"><i class="fa-solid fa-clock"></i></div>
+            <div class="stat-body"><div class="stat-value" id="statPending">—</div><div class="stat-label">طلبات معلقة</div></div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon"><i class="fa-solid fa-calendar-day"></i></div>
+            <div class="stat-body"><div class="stat-value" id="statToday">—</div><div class="stat-label">طلبات اليوم</div></div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-icon"><i class="fa-solid fa-coins"></i></div>
+            <div class="stat-body"><div class="stat-value" id="statRevenue">—</div><div class="stat-label">مبيعات اليوم (د.ع)</div></div>
+          </div>
+        </div>
+        <div class="dash-panels">
+          <div class="panel">
+            <div class="panel-header">
+              <h3><i class="fa-solid fa-clock-rotate-left"></i> آخر الطلبات</h3>
+              <a onclick="App.goTo('orders')" class="panel-link">عرض الكل</a>
+            </div>
+            <div id="recentOrders"><div class="empty-state"><i class="fa-solid fa-inbox"></i><p>لا توجد طلبات</p></div></div>
+          </div>
+          <div class="panel quick-panel">
+            <div class="panel-header"><h3><i class="fa-solid fa-bolt"></i> وصول سريع</h3></div>
+            <div class="quick-links">
+              <button class="quick-btn" onclick="App.goTo('kanban')"><i class="fa-solid fa-columns"></i><span>لوحة Kanban</span><small>حالة الطلبات</small></button>
+              <button class="quick-btn" onclick="App.goTo('tires')"><i class="fa-solid fa-circle-dot"></i><span>الإطارات</span><small id="qTires">—</small></button>
+              <button class="quick-btn" onclick="App.goTo('batteries')"><i class="fa-solid fa-battery-full"></i><span>البطاريات</span><small id="qBats">—</small></button>
+              <button class="quick-btn admin-only hidden" onclick="GPSMap.open()"><i class="fa-solid fa-map-location-dot"></i><span>خريطة السائقين</span><small>GPS مباشر</small></button>
+              <button class="quick-btn accent" onclick="App.goTo('builder')"><i class="fa-solid fa-file-invoice"></i><span>قائمة جديدة</span><small>ابدأ الآن</small></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ Kanban Board ══ -->
+      <div id="view-kanban" class="view">
+        <div class="page-header">
+          <h2><i class="fa-solid fa-columns"></i> لوحة حالة الطلبات</h2>
+          <div style="display:flex;gap:.5rem;align-items:center">
+            <button class="btn btn-outline-sm" onclick="KanbanBoard.load()">
+              <i class="fa-solid fa-rotate-right"></i> تحديث
+            </button>
+            <button class="btn btn-outline-sm admin-only hidden" onclick="GPSMap.open()">
+              <i class="fa-solid fa-map-location-dot"></i> خريطة GPS
+            </button>
+          </div>
+        </div>
+        <div id="kanbanWrap"></div>
+      </div>
+
+      <!-- ══ الإطارات ══ -->
+      <div id="view-tires" class="view">
+        <div class="page-header">
+          <h2><i class="fa-solid fa-circle-dot"></i> الإطارات (PCR + TBR)</h2>
+          <button class="btn btn-primary" onclick="AdminProducts.openModal('TIRES')">
+            <i class="fa-solid fa-plus"></i> إضافة
+          </button>
+        </div>
+        <div id="tirFilters" class="filter-bar"></div>
+        <div id="tirTable"  class="catalog-table-wrap"></div>
+      </div>
+
+      <!-- ══ البطاريات ══ -->
+      <div id="view-batteries" class="view">
+        <div class="page-header">
+          <h2><i class="fa-solid fa-battery-full"></i> البطاريات</h2>
+          <button class="btn btn-primary" onclick="AdminProducts.openModal('BATTERIES')">
+            <i class="fa-solid fa-plus"></i> إضافة
+          </button>
+        </div>
+        <div id="batFilters" class="filter-bar"></div>
+        <div id="batTable"  class="catalog-table-wrap"></div>
+      </div>
+
+      <!-- ══ قائمة الطلب ══ -->
+      <div id="view-builder" class="view">
+        <div class="page-header">
+          <h2><i class="fa-solid fa-file-invoice"></i> قائمة الطلب</h2>
+          <div class="builder-header-actions">
+            <button class="btn btn-outline-sm" onclick="Builder.newOrder()"><i class="fa-solid fa-file-circle-plus"></i> جديدة</button>
+            <button class="btn btn-outline-sm" onclick="Builder.printOrder()"><i class="fa-solid fa-print"></i> طباعة</button>
+            <button class="btn btn-whatsapp"   onclick="Builder.sendWhatsapp()"><i class="fa-brands fa-whatsapp"></i> واتساب</button>
+            <button class="btn btn-save"        onclick="Builder.saveOrder()"><i class="fa-solid fa-floppy-disk"></i> حفظ</button>
+          </div>
+        </div>
+        <div class="order-meta">
+          <div class="meta-field"><label>اسم العميل</label><input id="orderCustomer" placeholder="اسم العميل..."></div>
+          <div class="meta-field"><label>ملاحظات</label><input id="orderNotes" placeholder="ملاحظات..."></div>
+          <div class="meta-field small"><label>رقم الطلب</label><input id="orderNumber" value="—" readonly></div>
+          <div class="meta-field small"><label>التاريخ</label><input id="orderDate" readonly></div>
+        </div>
+        <div class="builder-table-wrap">
+          <table class="builder-table">
+            <thead><tr>
+              <th class="col-num">ت</th><th class="col-product">المادة</th>
+              <th class="col-notes">ملاحظات</th><th class="col-qty">العدد</th>
+              <th class="col-price">السعر</th><th class="col-total">المجموع</th><th class="col-action"></th>
+            </tr></thead>
+            <tbody id="builderBody"></tbody>
+          </table>
+        </div>
+        <div class="builder-bottom">
+          <div class="add-row-area">
+            <button class="btn-add-row" onclick="Builder.addRow()"><i class="fa-solid fa-plus"></i> إضافة صنف</button>
+            <button class="btn-add-from-catalog" onclick="App.goTo('tires')"><i class="fa-solid fa-magnifying-glass"></i> اختر من الكتالوج</button>
+          </div>
+          <div class="order-totals">
+            <div class="totals-row"><span>المجموع الفرعي</span><strong id="totSubtotal">0</strong></div>
+            <div class="totals-row discount-row">
+              <span>خصم %</span><input type="number" id="discountPct" min="0" max="100" value="0" oninput="Builder.calcTotals()" class="discount-input">
+              <span>أو مبلغ</span><input type="number" id="discountAmt" min="0" value="0" oninput="Builder.calcTotals()" class="discount-input">
+            </div>
+            <div class="totals-row"><span>مبلغ الخصم</span><strong id="totDiscount" class="text-danger">0</strong></div>
+            <div class="totals-divider"></div>
+            <div class="totals-row grand"><span>الإجمالي</span><strong id="totGrand">0</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ سجل الطلبات ══ -->
+      <div id="view-orders" class="view">
+        <div class="page-header"><h2><i class="fa-solid fa-clock-rotate-left"></i> سجل الطلبات</h2></div>
+        <div class="filter-bar">
+          <input type="text" id="ordersSearch" class="filter-input" placeholder="بحث برقم الطلب أو الاسم..." oninput="Orders.search()">
+          <select id="ordersStatus" class="filter-select" onchange="Orders.search()">
+            <option value="">كل الحالات</option>
+            <option value="معلق">معلق</option><option value="مؤكد">مؤكد</option>
+            <option value="قيد_التجهيز">قيد التجهيز</option><option value="جاهز">جاهز</option>
+            <option value="خرج_للتوزيع">خرج للتوزيع</option><option value="مُسلَّم">مُسلَّم</option>
+            <option value="مشكلة_تسليم">مشكلة تسليم</option><option value="ملغي">ملغي</option>
+          </select>
+        </div>
+        <div id="ordersTable" class="catalog-table-wrap"></div>
+      </div>
+
+      <!-- ══ سجل التسليمات ══ -->
+      <div id="view-deliveries" class="view">
+        <div class="page-header"><h2><i class="fa-solid fa-truck-fast"></i> سجل التسليمات</h2></div>
+        <div class="filter-bar">
+          <input type="text" id="deliveriesSearch" class="filter-input" placeholder="بحث..." oninput="Deliveries.search()">
+          <select id="deliveriesDriverFilter" class="filter-select" onchange="Deliveries.search()">
+            <option value="">كل السائقين</option>
+          </select>
+        </div>
+        <div id="deliveriesTable" class="catalog-table-wrap"></div>
+      </div>
+
+      <!-- ══ تقارير السائقين ══ -->
+      <div id="view-driverReports" class="view">
+        <div class="page-header"><h2><i class="fa-solid fa-chart-line"></i> تقارير السائقين</h2></div>
+        <div class="filter-bar">
+          <select id="reportDriverSelect" class="filter-select" onchange="DriverReports.run()"></select>
+          <input type="date" id="reportDateInput" class="filter-input" style="flex:0 0 180px" onchange="DriverReports.run()">
+        </div>
+        <div id="reportContent"></div>
+      </div>
+
+      <!-- ══ الزبائن ══ -->
+      <div id="view-users" class="view">
+        <div class="page-header"><h2><i class="fa-solid fa-users"></i> الزبائن</h2>
+          <button class="btn btn-primary" onclick="Users.openModal()"><i class="fa-solid fa-user-plus"></i> إضافة زبون</button>
+        </div>
+        <div id="usersTable" class="catalog-table-wrap"></div>
+      </div>
+
+      <!-- ══ الموظفون ══ -->
+      <div id="view-adminUsers" class="view admin-only hidden">
+        <div class="page-header"><h2><i class="fa-solid fa-user-tie"></i> الموظفون</h2>
+          <button class="btn btn-primary" onclick="Users.openModal()"><i class="fa-solid fa-user-plus"></i> إضافة موظف</button>
+        </div>
+        <div id="adminUsersTable" class="catalog-table-wrap"></div>
+      </div>
+
+      <!-- ══ السائقون ══ -->
+      <div id="view-drivers" class="view admin-only hidden">
+        <div class="page-header"><h2><i class="fa-solid fa-id-card-clip"></i> السائقون</h2>
+          <button class="btn btn-primary" onclick="Drivers.openModal()"><i class="fa-solid fa-user-plus"></i> إضافة سائق</button>
+        </div>
+        <div id="driversTable" class="catalog-table-wrap"></div>
+      </div>
+
+      <!-- ══ الإعدادات ══ -->
+      <div id="view-adminSettings" class="view admin-only hidden">
+        <div class="page-header"><h2><i class="fa-solid fa-gear"></i> إعدادات المتجر</h2></div>
+        <div class="settings-card">
+          <div class="settings-grid" id="settingsGrid"></div>
+          <div class="settings-actions">
+            <button class="btn btn-primary" onclick="AdminSettings.save()"><i class="fa-solid fa-floppy-disk"></i> حفظ</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ══ خريطة GPS ══ -->
+<div id="gpsMapModal" class="hidden">
+  <div class="gps-modal-header">
+    <h3><i class="fa-solid fa-map-location-dot"></i> خريطة تتبع السائقين — مباشر</h3>
+    <div style="display:flex;gap:.5rem;align-items:center">
+      <span id="gpsActiveCount" class="gps-active-bar" style="background:transparent;padding:0;font-size:.78rem">—</span>
+      <button class="gps-refresh-btn" onclick="GPSMap.refresh()">
+        <i class="fa-solid fa-rotate-right"></i> تحديث
+      </button>
+      <button class="gps-close-btn" onclick="GPSMap.close()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+  <div class="gps-modal-body">
+    <div id="gpsSidePanel"></div>
+    <div id="leafletMap"></div>
+  </div>
+</div>
+
+<!-- ══ النوافذ المنبثقة ══ -->
+<div id="orderModal" class="modal hidden">
+  <div class="modal-backdrop" onclick="Modal.close('orderModal')"></div>
+  <div class="modal-box large">
+    <div class="modal-header"><h3 id="orderModalTitle">تفاصيل الطلب</h3>
+      <button onclick="Modal.close('orderModal')" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="orderModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="Modal.close('orderModal')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<div id="productModal" class="modal hidden">
+  <div class="modal-backdrop" onclick="Modal.close('productModal')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3 id="productModalTitle">إضافة منتج</h3>
+      <button onclick="Modal.close('productModal')" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="productModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="Modal.close('productModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="AdminProducts.save()"><i class="fa-solid fa-floppy-disk"></i> حفظ</button>
+    </div>
+  </div>
+</div>
+
+<div id="userModal" class="modal hidden">
+  <div class="modal-backdrop" onclick="Modal.close('userModal')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3 id="userModalTitle">إضافة مستخدم</h3>
+      <button onclick="Modal.close('userModal')" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="userModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="Modal.close('userModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="Users.save()"><i class="fa-solid fa-floppy-disk"></i> حفظ</button>
+    </div>
+  </div>
+</div>
+
+<div id="permModal" class="modal hidden">
+  <div class="modal-backdrop" onclick="Modal.close('permModal')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3 id="permModalTitle">إدارة الصلاحيات</h3>
+      <button onclick="Modal.close('permModal')" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="permModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="Modal.close('permModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="Permissions.save()"><i class="fa-solid fa-shield-halved"></i> حفظ الصلاحيات</button>
+    </div>
+  </div>
+</div>
+
+<div id="assignModal" class="modal hidden">
+  <div class="modal-backdrop" onclick="Modal.close('assignModal')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3 id="assignModalTitle">إسناد سائق</h3>
+      <button onclick="Modal.close('assignModal')" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="assignModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="Modal.close('assignModal')">إغلاق</button>
+      <button class="btn btn-primary" onclick="AssignDriver.confirm()"><i class="fa-solid fa-truck-fast"></i> تأكيد الإسناد</button>
+    </div>
+  </div>
+</div>
+
+<div id="driverModal" class="modal hidden">
+  <div class="modal-backdrop" onclick="Modal.close('driverModal')"></div>
+  <div class="modal-box">
+    <div class="modal-header"><h3 id="driverModalTitle">إضافة سائق</h3>
+      <button onclick="Modal.close('driverModal')" class="modal-close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="driverModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="Modal.close('driverModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="Drivers.save()"><i class="fa-solid fa-floppy-disk"></i> حفظ</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer"></div>
+<div id="globalLoader" class="global-loader hidden">
+  <div class="loader-inner">
+    <i class="fa-solid fa-spinner fa-spin"></i>
+    <span id="loaderText">جارٍ التحميل...</span>
+  </div>
+</div>
+<div id="printPage" class="hidden print-only"><div id="printContent"></div></div>
+
+<!-- إضافة CSS للعناصر الجديدة -->
+<style>
+.btn-gps{
+  background:none;border:none;cursor:pointer;padding:.35rem;
+  border-radius:var(--radius-sm);font-size:1rem;color:var(--blue);transition:.2s;
+}
+.btn-gps:hover{background:var(--bg);}
+</style>
+
+<script src="js/config.js"></script>
+<script src="js/api-auth.js"></script>
+<script src="js/catalog.js"></script>
+<script src="js/drivers.js"></script>
+<script src="js/realtime.js"></script>
+<script src="js/app.js"></script>
+<script src="js/meta-pixel.js"></script>
+</body>
+</html>

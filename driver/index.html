@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f172a">
+<title>تطبيق السائق</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ══════════════ تسجيل الدخول ══════════════ -->
+<div id="loginPage">
+  <div class="login-wrap">
+    <div class="login-icon"><i class="fa-solid fa-truck-fast"></i></div>
+    <h1 id="loginTitle">بوابة السائق</h1>
+    <p class="login-sub">أدخل بيانات دخولك</p>
+    <form onsubmit="DAuth.login(event)">
+      <div class="l-input-wrap">
+        <i class="fa-solid fa-user"></i>
+        <input id="lu" type="text" placeholder="اسم المستخدم" autocomplete="username" required>
+      </div>
+      <div class="l-input-wrap">
+        <i class="fa-solid fa-lock"></i>
+        <input id="lp" type="password" placeholder="كلمة المرور" autocomplete="current-password" required>
+        <button type="button" onclick="DAuth.toggleEye()" class="eye-btn">
+          <i class="fa-solid fa-eye" id="eyeIco"></i>
+        </button>
+      </div>
+      <div id="loginErr" class="l-err hidden"></div>
+      <button type="submit" class="l-submit" id="lBtn">
+        <span id="lTxt"><i class="fa-solid fa-right-to-bracket"></i> دخول</span>
+        <span id="lSpin" class="hidden"><i class="fa-solid fa-spinner fa-spin"></i></span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ══════════════ التطبيق ══════════════ -->
+<div id="appRoot" class="hidden">
+
+  <!-- هيدر -->
+  <header id="dHeader">
+    <div class="dh-right">
+      <div class="dh-avatar" id="dAvatar">س</div>
+      <div>
+        <div class="dh-name" id="dName">—</div>
+        <div class="dh-date" id="dDate">—</div>
+      </div>
+    </div>
+    <div class="dh-left">
+      <button class="notif-btn" id="notifBtn" onclick="DApp.goTo('notifs')">
+        <i class="fa-solid fa-bell"></i>
+        <span class="notif-dot hidden" id="notifDot"></span>
+      </button>
+      <button class="dh-logout" onclick="DAuth.logout()" title="خروج">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ملخص اليوم الصغير -->
+  <div id="daySummaryBar">
+    <div class="dsb-item">
+      <span id="dsTotal">0</span>
+      <small>إجمالي</small>
+    </div>
+    <div class="dsb-sep"></div>
+    <div class="dsb-item green">
+      <span id="dsDelivered">0</span>
+      <small>مُسلَّم</small>
+    </div>
+    <div class="dsb-sep"></div>
+    <div class="dsb-item orange">
+      <span id="dsPending">0</span>
+      <small>متبقي</small>
+    </div>
+    <div class="dsb-sep"></div>
+    <div class="dsb-item red">
+      <span id="dsIssues">0</span>
+      <small>مشاكل</small>
+    </div>
+    <div class="dsb-sep"></div>
+    <div class="dsb-item blue">
+      <span id="dsCollected">—</span>
+      <small>محصّل</small>
+    </div>
+  </div>
+
+  <!-- شريط حالة GPS -->
+  <div id="gpsStatusBar" class="hidden" style="padding:.4rem 1rem;font-size:.76rem;font-weight:700;
+       display:flex;align-items:center;gap:.4rem;justify-content:center;transition:.3s"></div>
+
+  <!-- المحتوى -->
+  <main id="dMain">
+
+    <!-- ══ قائمة الطلبات ══ -->
+    <div id="view-orders" class="dview active">
+      <div id="ordersList"></div>
+      <div id="ordersEmpty" class="d-empty hidden">
+        <i class="fa-solid fa-box-open"></i>
+        <p>لا توجد طلبات مُسندة اليوم</p>
+      </div>
+    </div>
+
+    <!-- ══ نموذج التسليم ══ -->
+    <div id="view-delivery" class="dview">
+      <div class="delivery-header">
+        <button class="back-btn" onclick="DApp.goTo('orders')">
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <h2 id="deliveryOrderNum">ORD-00000</h2>
+        <span id="deliveryStatus" class="d-status-tag"></span>
+      </div>
+
+      <!-- معلومات الطلب -->
+      <div class="d-section" id="orderInfoSection">
+        <div class="d-section-title"><i class="fa-solid fa-circle-info"></i> معلومات الطلب</div>
+        <div class="info-grid" id="orderInfoGrid"></div>
+      </div>
+
+      <!-- بنود الطلب -->
+      <div class="d-section">
+        <div class="d-section-title"><i class="fa-solid fa-list-check"></i> الأصناف</div>
+        <div id="deliveryItems"></div>
+      </div>
+
+      <!-- نموذج التسليم (يظهر عند الضغط على تسجيل التسليم) -->
+      <div id="deliveryForm" class="hidden">
+        <div class="d-section">
+          <div class="d-section-title"><i class="fa-solid fa-coins"></i> التحصيل</div>
+          <div class="amount-row">
+            <div class="amount-expected">
+              <small>المبلغ المطلوب</small>
+              <strong id="amountExpected">0</strong>
+            </div>
+            <div class="amount-field">
+              <label>المبلغ المستلم (د.ع)</label>
+              <input type="number" id="amountReceived" placeholder="0" min="0"
+                     oninput="DDelivery.checkAmountDiff()" class="big-input">
+              <div id="amountDiff" class="amount-diff hidden"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-section">
+          <div class="d-section-title"><i class="fa-solid fa-shield-halved"></i> تأكيد الاستلام (PIN)</div>
+          <p class="pin-hint">اطلب من الزبون الرمز السري المكوّن من 4 أرقام وأدخله هنا</p>
+          <div class="pin-wrap">
+            <input type="tel" id="pinInput" maxlength="4" placeholder="• • • •"
+                   class="pin-input" oninput="DDelivery.onPINInput()">
+            <button class="pin-verify-btn" id="pinVerifyBtn" onclick="DDelivery.verifyPIN()" disabled>
+              <i class="fa-solid fa-check"></i> تحقق
+            </button>
+          </div>
+          <div id="pinStatus" class="pin-status hidden"></div>
+        </div>
+
+        <div class="d-section">
+          <div class="d-section-title"><i class="fa-solid fa-note-sticky"></i> ملاحظات السائق</div>
+          <textarea id="driverNotes" placeholder="أي ملاحظات حول التسليم..." class="d-textarea"></textarea>
+        </div>
+
+        <div class="d-actions">
+          <button class="btn-whatsapp-notif" onclick="DDelivery.notifyCustomerWhatsapp()">
+            <i class="fa-brands fa-whatsapp"></i> إشعار الزبون
+          </button>
+          <button class="btn-submit-delivery" id="submitDeliveryBtn"
+                  onclick="DDelivery.submit()" disabled>
+            <i class="fa-solid fa-circle-check"></i> تأكيد التسليم
+          </button>
+        </div>
+      </div>
+
+      <!-- أزرار الإجراءات الأساسية -->
+      <div id="orderActions" class="order-actions"></div>
+    </div>
+
+    <!-- ══ الإشعارات ══ -->
+    <div id="view-notifs" class="dview">
+      <div class="delivery-header">
+        <button class="back-btn" onclick="DApp.goTo('orders')">
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <h2>الإشعارات</h2>
+        <button class="read-all-btn" onclick="DNotifs.markAllRead()">قراءة الكل</button>
+      </div>
+      <div id="notifsList"></div>
+    </div>
+
+    <!-- ══ ملخص اليوم الكامل ══ -->
+    <div id="view-summary" class="dview">
+      <div class="delivery-header">
+        <button class="back-btn" onclick="DApp.goTo('orders')">
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <h2>ملخص اليوم</h2>
+        <span></span>
+      </div>
+      <div id="summaryContent"></div>
+    </div>
+
+  </main>
+
+  <!-- شريط التنقل السفلي -->
+  <nav id="dNav">
+    <button class="dnav active" data-view="orders" onclick="DApp.goTo('orders')">
+      <i class="fa-solid fa-list-check"></i>
+      <span>طلباتي</span>
+    </button>
+    <button class="dnav" data-view="summary" onclick="DApp.goTo('summary')">
+      <i class="fa-solid fa-chart-bar"></i>
+      <span>ملخص اليوم</span>
+    </button>
+    <button class="dnav" data-view="notifs" onclick="DApp.goTo('notifs')">
+      <i class="fa-solid fa-bell"></i>
+      <span>الإشعارات</span>
+      <span class="dnav-badge hidden" id="dnavNotifBadge">0</span>
+    </button>
+  </nav>
+</div>
+
+<!-- مؤشر تحميل -->
+<div id="dLoader" class="hidden">
+  <div class="loader-box">
+    <i class="fa-solid fa-spinner fa-spin"></i>
+    <span id="loaderMsg">جارٍ التحميل...</span>
+  </div>
+</div>
+
+<!-- إشعارات Toast -->
+<div id="dToasts"></div>
+
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/gps.js"></script>
+<script src="js/orders.js"></script>
+<script src="js/app.js"></script>
+<script src="js/meta-pixel.js"></script>
+</body>
+</html>

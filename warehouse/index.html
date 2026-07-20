@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#14532d">
+<title>نظام التجهيز</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ══ تسجيل الدخول ══ -->
+<div id="loginPage">
+  <div class="login-wrap">
+    <div class="login-icon"><i class="fa-solid fa-boxes-packing"></i></div>
+    <h1 id="loginTitle">نظام التجهيز والمخزن</h1>
+    <p class="login-sub">بوابة موظف التجهيز</p>
+    <form onsubmit="WAuth.login(event)">
+      <div class="l-input-wrap">
+        <i class="fa-solid fa-user"></i>
+        <input id="lu" type="text" placeholder="اسم المستخدم" autocomplete="username" required>
+      </div>
+      <div class="l-input-wrap">
+        <i class="fa-solid fa-lock"></i>
+        <input id="lp" type="password" placeholder="كلمة المرور" autocomplete="current-password" required>
+        <button type="button" onclick="WAuth.toggleEye()" class="eye-btn">
+          <i class="fa-solid fa-eye" id="eyeIco"></i>
+        </button>
+      </div>
+      <div id="loginErr" class="l-err hidden"></div>
+      <button type="submit" class="l-submit" id="lBtn">
+        <span id="lTxt"><i class="fa-solid fa-right-to-bracket"></i> دخول</span>
+        <span id="lSpin" class="hidden"><i class="fa-solid fa-spinner fa-spin"></i></span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ══ التطبيق ══ -->
+<div id="appRoot" class="hidden">
+
+  <!-- هيدر -->
+  <header id="wHeader">
+    <div class="wh-left">
+      <div class="wh-avatar" id="wAvatar">م</div>
+      <div>
+        <div class="wh-name" id="wName">—</div>
+        <div class="wh-role">موظف التجهيز</div>
+      </div>
+    </div>
+    <div class="wh-right">
+      <div class="wh-stats">
+        <div class="ws-item"><span id="wsNew">0</span><small>جديد</small></div>
+        <div class="ws-sep"></div>
+        <div class="ws-item orange"><span id="wsInProgress">0</span><small>جارٍ</small></div>
+        <div class="ws-sep"></div>
+        <div class="ws-item green"><span id="wsDone">0</span><small>أُكمل</small></div>
+      </div>
+      <button class="wh-logout" onclick="WAuth.logout()">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- محتوى -->
+  <main id="wMain">
+
+    <!-- ══ قائمة الطلبات ══ -->
+    <div id="view-list" class="wview active">
+      <div class="view-title">
+        <i class="fa-solid fa-list-check"></i> طلبات التجهيز
+        <span class="refresh-indicator" id="refreshInd"></span>
+      </div>
+      <div id="ordersList"></div>
+      <div id="listEmpty" class="w-empty hidden">
+        <i class="fa-solid fa-check-circle"></i>
+        <p>لا توجد طلبات في انتظار التجهيز</p>
+      </div>
+    </div>
+
+    <!-- ══ شاشة التجهيز ══ -->
+    <div id="view-prep" class="wview">
+      <div class="prep-header">
+        <button class="back-btn" onclick="WApp.goTo('list')">
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <div>
+          <div class="prep-order-num" id="prepOrderNum">ORD-00000</div>
+          <div class="prep-customer"  id="prepCustomer">—</div>
+        </div>
+        <button class="print-prep-btn" onclick="WApp.printPrepSheet()">
+          <i class="fa-solid fa-print"></i>
+        </button>
+      </div>
+
+      <!-- ملخص الطلب -->
+      <div class="prep-summary-bar">
+        <div class="ps-item">
+          <span id="psTotal">0</span><small>إجمالي البنود</small>
+        </div>
+        <div class="ps-item green">
+          <span id="psDone">0</span><small>مكتمل</small>
+        </div>
+        <div class="ps-item orange">
+          <span id="psPending">0</span><small>متبقٍ</small>
+        </div>
+        <div class="ps-item red">
+          <span id="psShortage">0</span><small>ناقص</small>
+        </div>
+      </div>
+
+      <!-- البنود -->
+      <div id="prepItemsList"></div>
+
+      <!-- ملاحظات + زر الإتمام -->
+      <div class="prep-footer">
+        <textarea id="prepNotes" placeholder="ملاحظات (اختياري)..." class="prep-notes"></textarea>
+        <div class="prep-actions">
+          <button class="btn-complete-prep" id="completePrepBtn" onclick="WPrep.complete()">
+            <i class="fa-solid fa-circle-check"></i> تأكيد اكتمال التجهيز
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- مؤشر تحميل -->
+<div id="wLoader" class="hidden">
+  <div class="loader-box">
+    <i class="fa-solid fa-spinner fa-spin"></i>
+    <span id="loaderMsg">جارٍ التحميل...</span>
+  </div>
+</div>
+
+<!-- إشعارات Toast -->
+<div id="wToasts"></div>
+
+<!-- صوت تنبيه (مخفي) -->
+<div id="soundEngine" style="display:none"></div>
+
+<!-- كل الكود في ملف واحد -->
+<script src="js/app.js"></script>
+</body>
+</html>
