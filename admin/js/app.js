@@ -51,6 +51,14 @@ const App = {
       if (wrap && !wrap.contains(e.target) && AdminNotifs._open) AdminNotifs.toggle();
     });
 
+    // إغلاق القائمة الجانبية عند لمس الطبقة السوداء (موبايل)
+    document.addEventListener('click', e=>{
+      if (!document.body.classList.contains('sidebar-open')) return;
+      const sb = document.getElementById('sidebar');
+      const mt = document.getElementById('menuToggle');
+      if (sb && !sb.contains(e.target) && mt && !mt.contains(e.target)) this.closeSidebar();
+    });
+
     this.goTo('dashboard');
   },
 
@@ -163,8 +171,15 @@ const App = {
     </tr>`;
   },
 
-  toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); },
-  closeSidebar()  { document.getElementById('sidebar').classList.remove('open'); }
+  toggleSidebar() {
+    const sb = document.getElementById('sidebar');
+    sb.classList.toggle('open');
+    document.body.classList.toggle('sidebar-open', sb.classList.contains('open'));
+  },
+  closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.body.classList.remove('sidebar-open');
+  }
 };
 
 
@@ -255,8 +270,19 @@ const Orders = {
         </div>
         <div style="display:flex;gap:1.5rem;flex-wrap:wrap;font-size:.85rem;margin-bottom:.4rem">
           <span>العنوان: <strong>${delivery['عنوان_التسليم']||'—'}</strong></span>
-          <span>PIN: ${pinOk?'<strong style="color:var(--green)">✓ مؤكَّد</strong>':'<strong style="color:var(--orange)">غير مؤكَّد</strong>'}</span>
+          <span>الحالة: ${pinOk?'<strong style="color:var(--green)">✓ تم تأكيد الاستلام</strong>':'<strong style="color:var(--orange)">بانتظار التأكيد</strong>'}</span>
         </div>
+        ${delivery['PIN'] && !pinOk ? `
+        <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;
+                    background:#fff;border:1.5px dashed #90caf9;border-radius:8px;
+                    padding:.6rem .85rem;margin-bottom:.4rem">
+          <span style="font-size:.8rem;color:var(--text-2)">رمز التأكيد للزبون:</span>
+          <strong style="font-family:monospace;font-size:1.3rem;letter-spacing:.25rem;color:var(--navy)">${delivery['PIN']}</strong>
+          <button class="btn btn-whatsapp" style="padding:.35rem .7rem;font-size:.78rem"
+                  onclick="AssignDriver.sendPinWhatsapp('${delivery['PIN']}','','${esc(o['اسم_عميل']||'')}','${o['رقم_طلب']}')">
+            <i class="fa-brands fa-whatsapp"></i> إرسال
+          </button>
+        </div>` : ''}
         ${delivery['وقت_التسليم']?`<div style="font-size:.85rem;display:flex;gap:1.5rem;flex-wrap:wrap">
           <span>مطلوب: <strong>${nf(expected)}</strong></span>
           <span>مستلم: <strong style="color:var(--green)">${nf(collected)}</strong></span>
