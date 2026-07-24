@@ -507,19 +507,154 @@ input,select { font-family:var(--font); direction:rtl; }
   .print-invoice .grand-total { font-size:1.2rem; font-weight:900; }
 }
 
-/* ══ استجابة ═════════════════════════════════════════════ */
-@media (max-width:1024px) { .stats-grid{grid-template-columns:repeat(2,1fr);} .dash-panels{grid-template-columns:1fr;} }
-@media (max-width:768px) {
-  #sidebar{transform:translateX(100%);} #sidebar.open{transform:translateX(0);}
-  #mainWrap{margin-right:0;} #menuToggle{display:flex;}
-  .stats-grid{grid-template-columns:repeat(2,1fr);}
-  .modal-form-grid{grid-template-columns:1fr;}
-  #mainContent{padding:1rem;}
-}
-@media (max-width:480px) { .stats-grid{grid-template-columns:1fr 1fr;} .login-card{padding:2rem 1.5rem;margin:0 .75rem;} }
+/* ══ الاستجابة للشاشات — انظر آخر الملف ══ */
 
 /* أنيميشن الإشعار المنبثق */
 @keyframes bannerIn {
   from { opacity:0; transform:translateX(-50%) translateY(-12px); }
   to   { opacity:1; transform:translateX(-50%) translateY(0); }
+}
+
+/* ══════════════════════════════════════════════════════════
+   عناصر Kanban الجديدة
+   ══════════════════════════════════════════════════════════ */
+.kb-card-pin{
+  font-size:.75rem;color:#0277bd;background:#e1f5fe;
+  border-radius:5px;padding:.25rem .5rem;margin-top:.3rem;
+  display:flex;align-items:center;gap:.3rem;
+}
+.kb-card-pin strong{font-family:monospace;font-size:.9rem;letter-spacing:.08em;}
+.kb-action-btn.outline{
+  background:#fff;color:#0277bd;border:1.5px solid #b3e5fc;
+}
+.kb-action-btn.outline:hover{background:#e1f5fe;}
+
+/* ══════════════════════════════════════════════════════════
+   الاستجابة للشاشات — نسخة كاملة
+   ══════════════════════════════════════════════════════════ */
+
+/* ── تمرير أفقي لكل الجداول ── */
+.catalog-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.catalog-table{min-width:640px;}
+.builder-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.builder-table{min-width:680px;}
+
+/* ══ أجهزة لوحية ══ */
+@media (max-width:1024px){
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .dash-panels{grid-template-columns:1fr;}
+  .driver-stat-grid{grid-template-columns:repeat(2,1fr);}
+  .notif-panel{width:300px;}
+}
+
+/* ══ موبايل ══ */
+@media (max-width:768px){
+  /* الشريط الجانبي كقائمة منزلقة */
+  #sidebar{
+    position:fixed;top:0;right:0;z-index:900;
+    transform:translateX(100%);transition:transform .25s ease;
+    box-shadow:-8px 0 32px rgba(0,0,0,.3);
+  }
+  #sidebar.open{transform:translateX(0);}
+  #mainWrap{margin-right:0;width:100%;}
+  #menuToggle{display:flex;}
+
+  /* طبقة سوداء خلف القائمة */
+  body.sidebar-open::after{
+    content:'';position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:800;
+  }
+
+  /* الهيدر: إخفاء العناصر الثانوية */
+  #topHeader{padding:0 .75rem;gap:.35rem;}
+  .header-title{font-size:.92rem;}
+  .rt-indicator{display:none;}
+  .header-user{display:none;}
+  .btn-new-order span,
+  .btn-new-order{font-size:.78rem;padding:.4rem .65rem;}
+
+  /* المحتوى */
+  #mainContent{padding:.85rem .7rem;}
+  .page-header{flex-direction:column;align-items:stretch;gap:.6rem;}
+  .page-header h2{font-size:1rem;}
+  .page-header > div{display:flex;gap:.4rem;flex-wrap:wrap;}
+  .page-header .btn{flex:1;justify-content:center;font-size:.82rem;}
+
+  /* الإحصائيات */
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:.6rem;}
+  .stat-card{padding:.85rem;}
+  .stat-value{font-size:1.25rem;}
+  .stat-label{font-size:.7rem;}
+  .stat-icon{width:38px;height:38px;font-size:1rem;}
+
+  /* أشرطة الفلترة */
+  .filter-bar{flex-direction:column;gap:.5rem;}
+  .filter-input,.filter-select{width:100%;min-width:0;}
+
+  /* النوافذ المنبثقة */
+  .modal-box{width:calc(100% - 1.5rem);max-height:88vh;margin:0 .75rem;}
+  .modal-box.large{width:calc(100% - 1.5rem);}
+  .modal-body{max-height:64vh;overflow-y:auto;padding:1rem;}
+  .modal-form-grid{grid-template-columns:1fr;}
+  .modal-footer{flex-direction:column-reverse;gap:.5rem;}
+  .modal-footer .btn{width:100%;justify-content:center;}
+
+  /* لوحة الإشعارات */
+  .notif-panel{
+    position:fixed;top:60px;left:.6rem;right:.6rem;width:auto;
+    max-height:70vh;
+  }
+
+  /* منشئ القائمة */
+  .order-meta{grid-template-columns:1fr;gap:.5rem;}
+  .builder-header-actions{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;width:100%;}
+  .builder-header-actions .btn{width:100%;justify-content:center;font-size:.8rem;padding:.5rem;}
+  .builder-bottom{flex-direction:column;gap:.85rem;}
+  .order-totals{width:100%;}
+  .add-row-area{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;width:100%;}
+  .add-row-area button{width:100%;justify-content:center;font-size:.8rem;}
+  .discount-row{flex-wrap:wrap;gap:.35rem;}
+  .discount-input{width:70px;}
+
+  /* Kanban عمودي */
+  .kanban-board{flex-direction:column;gap:.6rem;min-height:auto;}
+  .kb-column{min-width:100%;max-width:100%;}
+  .kb-col-body{max-height:none;}
+
+  /* تقارير السائقين */
+  .driver-stat-grid{grid-template-columns:repeat(2,1fr);gap:.5rem;}
+  .driver-stat-card{padding:.75rem;}
+  .driver-stat-card .val{font-size:1.15rem;}
+
+  /* خريطة GPS */
+  .gps-modal-header{padding:.7rem .85rem;flex-wrap:wrap;gap:.4rem;}
+  .gps-modal-header h3{font-size:.85rem;}
+  #gpsSidePanel{
+    display:block;width:100%;height:38%;
+    border-right:none;border-bottom:1px solid var(--border);
+  }
+  .gps-modal-body{flex-direction:column;}
+  #leafletMap{height:62%;}
+
+  /* الإعدادات */
+  .settings-grid{grid-template-columns:1fr;}
+}
+
+/* ══ شاشات صغيرة جداً ══ */
+@media (max-width:420px){
+  #sidebar{width:82vw;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .login-card{padding:1.75rem 1.25rem;margin:0 .6rem;}
+  .btn-new-order{font-size:0;padding:.45rem .6rem;}
+  .btn-new-order i{font-size:.9rem;}
+  .builder-header-actions{grid-template-columns:1fr;}
+  .add-row-area{grid-template-columns:1fr;}
+  .catalog-table{min-width:560px;font-size:.8rem;}
+  .kb-card{padding:.65rem;}
+}
+
+/* ══ منع التكبير التلقائي في iOS عند التركيز على الحقول ══ */
+@media (max-width:768px){
+  input,select,textarea{font-size:16px !important;}
+  .cell-input,.qty-input,.price-input,
+  .filter-input,.filter-select,.discount-input{font-size:16px !important;}
 }
