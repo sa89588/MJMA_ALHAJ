@@ -356,3 +356,44 @@ input,select,textarea{font-family:var(--font);direction:rtl;}
   #wMain{max-width:540px;margin:0 auto;}
   #wToasts{max-width:500px;left:50%;right:auto;transform:translateX(-50%);}
 }
+
+/* ══════════════════════════════════════════════════════════
+   تحسينات الشاشات الصغيرة
+   ══════════════════════════════════════════════════════════ */
+
+/* منع تكبير iOS التلقائي */
+input,select,textarea{font-size:16px;}
+
+@media (max-width:480px){
+  /* الهيدر: الإحصائيات تزاحم الاسم */
+  #wHeader{padding:0 .6rem;}
+  .wh-name{font-size:.82rem;max-width:100px;overflow:hidden;
+           text-overflow:ellipsis;white-space:nowrap;}
+  .wh-role{font-size:.62rem;}
+  .wh-stats{padding:.3rem .5rem;gap:.35rem;}
+  .ws-item{min-width:26px;}
+  .ws-item span{font-size:.88rem;}
+  .ws-item small{font-size:.52rem;}
+
+  /* بطاقات الطلبات */
+  .order-card{margin-bottom:.55rem;}
+  .oc-top{padding:.7rem .8rem;}
+  .oc-num{font-size:.9rem;}
+
+  /* شريط ملخص التجهيز */
+  .ps-item span{font-size:1rem;}
+  .ps-item small{font-size:.55rem;}
+
+  /* بطاقة البند */
+  .prep-item-card{margin:.45rem .5rem;}
+  .pic-top{padding:.7rem .8rem;gap:.6rem;}
+  .pic-name{font-size:.86rem;}
+  .qty-row{flex-wrap:wrap;gap:.4rem;}
+  .qty-row label{min-width:auto;flex:1 1 100%;}
+  .shortage-badge{margin-right:0;}
+}
+
+@media (max-width:360px){
+  .ws-item small{display:none;}
+  .wh-stats{padding:.25rem .4rem;}
+}
