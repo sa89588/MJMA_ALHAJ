@@ -668,3 +668,43 @@ input  { font-family:var(--font); direction:rtl; }
   #mainArea { max-width:680px; margin:0 auto; }
   #floatCart { max-width:640px; left:50%; right:auto; transform:translateX(-50%); }
 }
+
+/* ══════════════════════════════════════════════════════════
+   تحسينات الشاشات الصغيرة
+   ══════════════════════════════════════════════════════════ */
+
+/* منع تكبير iOS التلقائي عند التركيز على الحقول */
+input,select,textarea{font-size:16px;}
+
+/* ══ هواتف عادية ══ */
+@media (max-width:480px){
+  /* شريط التتبع: 6 مراحل تحتاج مساحة */
+  .tracking-steps{gap:.15rem;}
+  .track-step span{font-size:.58rem;line-height:1.15;}
+  .track-icon{width:26px;height:26px;font-size:.65rem;}
+
+  /* الكتالوج */
+  .product-grid{grid-template-columns:1fr;gap:.6rem;}
+  .prod-card{padding:.75rem;}
+
+  /* الفلاتر */
+  .cat-filters{flex-direction:column;gap:.45rem;}
+  .cat-filters select,.cat-filters input{width:100%;}
+
+  /* السلة */
+  .cart-item{flex-wrap:wrap;gap:.4rem;}
+  .cart-item-actions{width:100%;justify-content:space-between;}
+
+  /* تفاصيل الطلب */
+  .order-item-row{flex-wrap:wrap;gap:.35rem;}
+  .oir-info{flex:1 1 60%;min-width:0;}
+  .oir-name{word-break:break-word;}
+}
+
+/* ══ هواتف ضيقة جداً (320–380px) ══ */
+@media (max-width:380px){
+  .tracking-steps{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:.25rem;}
+  .track-step{min-width:52px;}
+  .oc-num{font-size:.85rem;}
+  .oc-total{font-size:.95rem;}
+}
