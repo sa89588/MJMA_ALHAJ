@@ -126,7 +126,10 @@ const AssignDriver = {
           <input id="ad_address" placeholder="اكتب عنوان الزبون يدوياً...">
         </div>
       </div>
-      <div id="assignResult"></div>`;
+      <p style="font-size:.78rem;color:#8a9ab0;margin-top:.5rem">
+        <i class="fa-solid fa-circle-info"></i>
+        سيُولَّد رمز تأكيد (PIN) تلقائياً ويظهر على بطاقة الطلب لإعطائه للزبون.
+      </p>`;
   },
 
   async confirm() {
@@ -140,30 +143,40 @@ const AssignDriver = {
 
     if (!res?.ok) { UI.toast(res?.error || 'فشل الإسناد', 'error'); return; }
 
-    UI.toast('تم إسناد الطلب بنجاح', 'success');
+    // إغلاق النافذة فوراً — الإسناد قرار إداري لا يحتاج تأكيداً من أحد
+    Modal.close('assignModal');
 
-    // عرض الـ PIN وزر واتساب لإرساله للزبون
-    document.getElementById('assignResult').innerHTML = `
-      <div class="pin-display-box">
-        <div class="pin-label">رمز التأكيد (PIN) — أرسله للزبون</div>
-        <div class="pin-value">${res.pin}</div>
-        <div class="pin-actions">
-          ${res.customerPhone ? `
-          <button class="btn btn-whatsapp btn-sm" onclick="AssignDriver.sendPinWhatsapp('${res.pin}','${res.customerPhone}','${esc(res.customerName||'')}')">
-            <i class="fa-brands fa-whatsapp"></i> إرسال عبر واتساب
-          </button>` : `<small style="color:rgba(255,255,255,.6)">لا يوجد رقم هاتف مسجّل للزبون</small>`}
-        </div>
-      </div>`;
+    // حفظ الـ PIN محلياً لعرضه على البطاقة
+    AssignDriver._lastPins[this._orderNum] = res.pin;
 
-    if (Orders._all?.length) Orders.load();
+    UI.toast(`✅ أُسند إلى ${driver} — رمز التأكيد: ${res.pin}`, 'success');
+    if (window.Sound) Sound.play('success');
+
+    // تحديث الواجهة المفتوحة حالياً
+    if (document.getElementById('view-kanban')?.classList.contains('active')) {
+      await KanbanBoard.load();
+    }
+    if (document.getElementById('view-orders')?.classList.contains('active')) {
+      await Orders.load();
+    }
   },
 
-  sendPinWhatsapp(pin, phone, customerName) {
+  // ذاكرة مؤقتة لأرقام PIN المولّدة في هذه الجلسة
+  _lastPins: {},
+
+  sendPinWhatsapp(pin, phone, customerName, orderNum) {
     const storeName = App._settings.store_name || 'المتجر';
     const msg = encodeURIComponent(
-      `🔐 *${storeName}*\nمرحباً ${customerName}\nرمز تأكيد استلام طلبك: *${pin}*\nيرجى إعطاء هذا الرمز للسائق عند التسليم.`
+      `🔐 *${storeName}*\n` +
+      `مرحباً ${customerName || ''}\n` +
+      (orderNum ? `طلبك: ${orderNum}\n` : '') +
+      `رمز تأكيد الاستلام: *${pin}*\n` +
+      `يرجى إعطاء هذا الرمز للسائق عند التسليم.`
     );
-    window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+    // بدون رقم → يفتح واتساب لاختيار جهة الاتصال يدوياً
+    const url = phone ? `https://wa.me/${phone}?text=${msg}`
+                      : `https://wa.me/?text=${msg}`;
+    window.open(url, '_blank');
   }
 };
 
