@@ -492,3 +492,48 @@ input,select,textarea{font-family:var(--font);direction:rtl;}
   #dToasts{max-width:460px;left:50%;transform:translateX(-50%);}
   #dLoader .loader-box{min-width:220px;}
 }
+
+/* ══════════════════════════════════════════════════════════
+   تحسينات الشاشات الصغيرة
+   ══════════════════════════════════════════════════════════ */
+
+/* منع تكبير iOS التلقائي */
+input,select,textarea{font-size:16px;}
+.pin-input{font-size:1.6rem;}
+.big-input{font-size:1.3rem;}
+
+@media (max-width:480px){
+  /* شريط ملخص اليوم: 5 عناصر ضيقة */
+  #daySummaryBar{padding:0 .25rem;}
+  .dsb-item span{font-size:.95rem;}
+  .dsb-item small{font-size:.55rem;}
+  .dsb-sep{height:22px;}
+
+  /* الهيدر */
+  #dHeader{padding:0 .65rem;}
+  .dh-name{font-size:.82rem;}
+  .dh-date{font-size:.65rem;max-width:150px;overflow:hidden;
+           text-overflow:ellipsis;white-space:nowrap;}
+
+  /* بطاقات الطلبات */
+  .order-card{margin:.5rem .5rem;}
+  .oc-top{padding:.7rem .8rem;}
+  .oc-address{max-width:170px;overflow:hidden;
+              text-overflow:ellipsis;white-space:nowrap;}
+
+  /* نموذج التسليم */
+  .amount-row{flex-direction:column;gap:.5rem;}
+  .amount-expected{flex:1 1 auto;width:100%;}
+  .del-item-inputs{grid-template-columns:1fr;}
+  .pin-wrap{flex-direction:column;}
+  .pin-verify-btn{width:100%;justify-content:center;}
+
+  /* ملخص اليوم */
+  .summary-stats{grid-template-columns:1fr 1fr;}
+}
+
+@media (max-width:360px){
+  .dsb-item small{display:none;}
+  .oc-btn{font-size:.78rem;padding:.55rem .35rem;}
+  .dnav span{font-size:.55rem;}
+}
