@@ -181,11 +181,18 @@ const KanbanBoard = {
 
   render(data) {
     const wrap = document.getElementById('kanbanWrap');
+
+    // تقسيم عمود "جاهز" حسب وجود سائق مُسنَد
+    const readyAll      = data.columns['جاهز'] || [];
+    const readyPending  = readyAll.filter(c => !c.driver);
+    const readyAssigned = readyAll.filter(c =>  c.driver);
+
     const cols = [
       { key:'معلق',          label:'طلبات جديدة',   icon:'fa-inbox',         color:'#1565c0', action:'confirm'   },
       { key:'مؤكد',          label:'للتجهيز',        icon:'fa-check-circle',  color:'#7b1fa2', action:'send_prep'  },
       { key:'قيد_التجهيز',   label:'يُجهَّز الآن',  icon:'fa-boxes-packing', color:'#e65100', action:null         },
-      { key:'جاهز',          label:'جاهز للإسناد',  icon:'fa-box-open',      color:'#2e7d32', action:'assign'     },
+      { key:'_ready',        label:'جاهز للإسناد',  icon:'fa-box-open',      color:'#2e7d32', action:'assign',   cards:readyPending  },
+      { key:'_assigned',     label:'مُسند لسائق',   icon:'fa-user-check',    color:'#0277bd', action:'reassign', cards:readyAssigned },
       { key:'خرج_للتوزيع',   label:'في الطريق',     icon:'fa-truck-fast',    color:'#00838f', action:null         },
       { key:'مُسلَّم',        label:'تم التسليم',    icon:'fa-flag-checkered',color:'#388e3c', action:null         },
       { key:'مشكلة_تسليم',   label:'تنبيهات',       icon:'fa-triangle-exclamation',color:'#c62828', action:null   }
@@ -196,7 +203,7 @@ const KanbanBoard = {
     wrap.innerHTML = `
       <div class="kanban-board" id="kanbanBoard">
         ${cols.map(col=>{
-          const cards = data.columns[col.key] || [];
+          const cards = col.cards || data.columns[col.key] || [];
           return `
             <div class="kb-column">
               <div class="kb-col-header" style="border-top:3px solid ${col.color}">
@@ -247,8 +254,15 @@ const KanbanBoard = {
         actionBtn = `<button class="kb-action-btn green" onclick="AssignDriver.open('${c.orderNum}')">
           <i class="fa-solid fa-truck-fast"></i> إسناد سائق
         </button>`;
+      } else if (col.action === 'reassign') {
+        actionBtn = `<button class="kb-action-btn outline" onclick="AssignDriver.open('${c.orderNum}')">
+          <i class="fa-solid fa-rotate"></i> تغيير السائق
+        </button>`;
       }
     }
+
+    // رمز التأكيد المولّد في هذه الجلسة (إن وُجد)
+    const pin = (window.AssignDriver && AssignDriver._lastPins[c.orderNum]) || '';
 
     return `
       <div class="kb-card ${urgent?'urgent':''}" onclick="event.target.closest('.kb-action-btn')||Orders.view('${c.orderNum}')">
@@ -261,8 +275,9 @@ const KanbanBoard = {
           <span class="kb-card-amount">${amtK} د.ع</span>
           <span class="kb-card-items">${c.itemCount} صنف</span>
         </div>
-        ${c.driver ? `<div class="kb-card-driver"><i class="fa-solid fa-truck"></i> ${c.driver}</div>` : ''}
-        ${c.prepWorker ? `<div class="kb-card-prep"><i class="fa-solid fa-person-digging"></i> ${c.prepWorker}</div>` : ''}
+        ${c.driver ? `<div class="kb-card-driver"><i class="fa-solid fa-truck"></i> ${esc(c.driver)}</div>` : ''}
+        ${pin ? `<div class="kb-card-pin"><i class="fa-solid fa-key"></i> رمز التأكيد: <strong>${pin}</strong></div>` : ''}
+        ${c.prepWorker ? `<div class="kb-card-prep"><i class="fa-solid fa-person-digging"></i> ${esc(c.prepWorker)}</div>` : ''}
         ${actionBtn ? `<div class="kb-card-actions">${actionBtn}</div>` : ''}
       </div>`;
   },
